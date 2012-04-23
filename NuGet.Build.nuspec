@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>NuGet.Build</id>
+    <version>0.25</version>
+    <authors>David Fowler</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>MSBuild targets for nuget package restore and package build.</description>
+    <licenseUrl>http://nuget.codeplex.com/license</licenseUrl>
+    <dependencies>
+        <dependency id="NuGet.CommandLine" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="*.*" target="tools" />
+  </files>
+</package>

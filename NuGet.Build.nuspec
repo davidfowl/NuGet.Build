@@ -10,6 +10,7 @@
     <dependencies>
         <dependency id="NuGet.CommandLine" />
     </dependencies>
+	<projectUrl>https://github.com/davidfowl/NuGet.Build</projectUrl>
   </metadata>
   <files>
     <file src="*.*" target="tools" />

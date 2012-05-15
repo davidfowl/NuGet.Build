@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
     <PropertyGroup>
         <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(MSBuildProjectDirectory)\..\</SolutionDir>
+        
+        <!-- Enable the restore command to run before builds -->
+        <RestorePackages Condition="$(RestorePackages) == ''">false</RestorePackages>
+
+        <!-- Property that enables building a package from a project -->
+        <BuildPackage Condition="$(BuildPackage) == ''">false</BuildPackage>
     </PropertyGroup>
+    
+    <ItemGroup Condition=" $(PackageSources) == '' ">
+        <!-- Package sources used to restore packages. By default will used the registered sources under %APPDATA%\NuGet\NuGet.Config -->
+        <!--
+            <PackageSource Include="https://nuget.org/api/v2/" />
+            <PackageSource Include="https://my-nuget-source/nuget/" />
+        -->
+    </Item>
 
     <PropertyGroup Condition=" '$(OS)' == 'Windows_NT'">
         <!-- Windows specific commands -->
@@ -21,22 +36,15 @@
     <PropertyGroup>
         <!-- NuGet command -->
         <NuGetExePath>$(NuGetToolsPath)\nuget.exe</NuGetExePath>
+        <PackageSources Condition=" $(PackageSources) == '' ">@(PackageSource)</PackageSources>
+        
         <NuGetCommand Condition=" '$(OS)' == 'Windows_NT'">"$(NuGetExePath)"</NuGetCommand>
         <NuGetCommand Condition=" '$(OS)' != 'Windows_NT' ">mono --runtime=v4.0.30319 $(NuGetExePath)</NuGetCommand>
 
         <PackageOutputDir Condition="$(PackageOutputDir) == ''">$(TargetDir.Trim('\\'))</PackageOutputDir>
 
-        <!-- Package sources used to restore packages. By default will used the registered sources under %APPDATA%\NuGet\NuGet.Config -->
-        <PackageSources Condition="$(PackageSources) == ''">""</PackageSources>
-
-        <!-- Enable the restore command to run before builds -->
-        <RestorePackages Condition="$(RestorePackages) == ''">false</RestorePackages>
-
-        <!-- Property that enables building a package from a project -->
-        <BuildPackage Condition="$(BuildPackage) == ''">false</BuildPackage>
-
         <!-- Commands -->
-        <RestoreCommand>$(NuGetCommand) install "$(PackagesConfig)" -source $(PackageSources) -o "$(PackagesDir)"</RestoreCommand>
+        <RestoreCommand>$(NuGetCommand) install "$(PackagesConfig)" -source "$(PackageSources)" -o "$(PackagesDir)"</RestoreCommand>
         <BuildCommand>$(NuGetCommand) pack "$(ProjectPath)" -p Configuration=$(Configuration) -o "$(PackageOutputDir)" -symbols</BuildCommand>
 
         <!-- Make the build depend on restore packages -->

@@ -37,16 +37,31 @@
 
         <!-- Commands -->
         <RestoreCommand>$(NuGetCommand) install "$(PackagesConfig)" -source $(PackageSources) -o "$(PackagesDir)"</RestoreCommand>
+        <UpdateCommand>$(NuGetCommand) update "$(PackagesConfig)" -source $(PackageSources) -RepositoryPath "$(PackagesDir)"</UpdateCommand>
+        <UpdateNuGetCommand>$(NuGetCommand) update -Self</UpdateNuGetCommand>
         <BuildCommand>$(NuGetCommand) pack "$(ProjectPath)" -p Configuration=$(Configuration) -o "$(PackageOutputDir)" -symbols</BuildCommand>
 
         <!-- Make the build depend on restore packages -->
         <BuildDependsOn Condition="$(RestorePackages) == 'true'">
-            RestorePackages;
+            UpdateNuGet;
+			RestorePackages;
             $(BuildDependsOn);
         </BuildDependsOn>
 
-        <!-- Make the build depend on restore packages -->
+        <!-- Make the build depend on update packages 
+		
+		Note: First restore will pull down currently referenced packages, update will update the references only, second restore will actually pull down the updated packages -->
+        <BuildDependsOn Condition="$(RestorePackages) == 'update'">
+			UpdateNuGet;
+			RestorePackages;
+			UpdatePackages;
+			RestorePackages;
+            $(BuildDependsOn);
+        </BuildDependsOn>
+
+        <!-- Make the build depend on build packages -->
         <BuildDependsOn Condition="$(BuildPackage) == 'true'">
+			UpdateNuGet;
             $(BuildDependsOn);
             BuildPackage;
         </BuildDependsOn>
@@ -62,6 +77,25 @@
               Condition="'$(OS)' != 'Windows_NT' And Exists('$(PackagesConfig)')" />
               
         <Exec Command="$(RestoreCommand)"
+              LogStandardErrorAsError="true"
+              Condition="'$(OS)' == 'Windows_NT' And Exists('$(PackagesConfig)')" />
+    </Target>
+
+	<Target Name="UpdateNuGet" DependsOnTargets="CheckPrerequisites">
+        <Exec Command="$(UpdateNuGetCommand)"
+              Condition="'$(OS)' != 'Windows_NT' And Exists('$(PackagesConfig)')" />
+              
+        <Exec Command="$(UpdateNuGetCommand)"
+              LogStandardErrorAsError="true"
+              Condition="'$(OS)' == 'Windows_NT' And Exists('$(PackagesConfig)')" />
+    </Target>
+
+	
+	<Target Name="UpdatePackages" DependsOnTargets="CheckPrerequisites">
+        <Exec Command="$(UpdateCommand)"
+              Condition="'$(OS)' != 'Windows_NT' And Exists('$(PackagesConfig)')" />
+              
+        <Exec Command="$(UpdateCommand)"
               LogStandardErrorAsError="true"
               Condition="'$(OS)' == 'Windows_NT' And Exists('$(PackagesConfig)')" />
     </Target>

@@ -5,10 +5,10 @@
         <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(MSBuildProjectDirectory)\..\</SolutionDir>
         
         <!-- Enable the restore command to run before builds -->
-        <RestorePackages Condition="$(RestorePackages) == ''">false</RestorePackages>
+        <RestorePackages Condition=" '$(RestorePackages)' == '' ">false</RestorePackages>
 
         <!-- Property that enables building a package from a project -->
-        <BuildPackage Condition="$(BuildPackage) == ''">false</BuildPackage>
+        <BuildPackage Condition=" '$(BuildPackage)' == '' ">false</BuildPackage>
     </PropertyGroup>
     
     <ItemGroup Condition=" $(PackageSources) == '' ">
@@ -17,7 +17,7 @@
             <PackageSource Include="https://nuget.org/api/v2/" />
             <PackageSource Include="https://my-nuget-source/nuget/" />
         -->
-    </Item>
+    </ItemGroup>
 
     <PropertyGroup Condition=" '$(OS)' == 'Windows_NT'">
         <!-- Windows specific commands -->
@@ -44,7 +44,7 @@
         <PackageOutputDir Condition="$(PackageOutputDir) == ''">$(TargetDir.Trim('\\'))</PackageOutputDir>
 
         <!-- Commands -->
-        <RestoreCommand>$(NuGetCommand) install "$(PackagesConfig)" -source &quot;$(PackageSources)&quot; -o "$(PackagesDir)"</RestoreCommand>
+        <RestoreCommand>$(NuGetCommand) install "$(PackagesConfig)" -source "$(PackageSources)" -o "$(PackagesDir)"</RestoreCommand>
         <BuildCommand>$(NuGetCommand) pack "$(ProjectPath)" -p Configuration=$(Configuration) -o "$(PackageOutputDir)" -symbols</BuildCommand>
 
         <!-- Make the build depend on restore packages -->

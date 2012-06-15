@@ -65,6 +65,7 @@
     <Target Name="CheckPrerequisites">
         <!-- Raise an error if we're unable to locate nuget.exe  -->
         <Error Condition="'$(DownloadNuGetExe)' != 'true' AND !Exists('$(NuGetExePath)')" Text="Unable to locate '$(NuGetExePath)'" />
+        <SetEnvironmentVariable EnvKey="VisualStudioVersion" EnvValue="$(VisualStudioVersion)" />
         <DownloadNuGet OutputFilename="$(NuGetExePath)" Condition=" '$(DownloadNuGetExe)' == 'true' AND !Exists('$(NuGetExePath)')"  />
     </Target>
 
@@ -111,6 +112,25 @@
                 catch (Exception ex) {
                     Log.LogErrorFromException(ex);
                     return false;
+                }
+            ]]>
+            </Code>
+        </Task>
+    </UsingTask>
+    
+     <UsingTask TaskName="SetEnvironmentVariable" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+        <ParameterGroup>
+            <EnvKey ParameterType="System.String" Required="true" />
+            <EnvValue ParameterType="System.String" Required="true" />
+        </ParameterGroup>
+        <Task>
+            <Using Namespace="System" />
+            <Code Type="Fragment" Language="cs">
+                <![CDATA[
+                try {
+                    Environment.SetEnvironmentVariable(EnvKey, EnvValue, System.EnvironmentVariableTarget.Process);
+                }
+                catch  {
                 }
             ]]>
             </Code>
